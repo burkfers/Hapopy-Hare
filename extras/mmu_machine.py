@@ -1,4 +1,4 @@
-# Happy Hare MMU Software
+# Hapopy Hare MMU Software
 #
 # Definition of basic physical characteristics of MMU (including type/style)
 #   - allows for hardware configuration validation
@@ -17,7 +17,7 @@
 #
 # (\_/)
 # ( *,*)
-# (")_(") Happy Hare Ready
+# (")_(") Hapopy Hare Ready
 #
 # This file may be distributed under the terms of the GNU GPLv3 license.
 #
@@ -335,7 +335,7 @@ class MmuToolHead(toolhead.ToolHead, object):
         self.last_flush_time = self.last_sg_flush_time = self.min_restart_time = 0. # last_sg_flush_time deprecated
         self.need_flush_time = self.step_gen_time = self.clear_history_time = 0.
         # Kinematic step generation scan window time tracking
-        self.kin_flush_delay = toolhead.SDS_CHECK_TIME # Happy Hare: Use base class
+        self.kin_flush_delay = toolhead.SDS_CHECK_TIME # Hapopy Hare: Use base class
         self.kin_flush_times = []
         # Setup iterative solver
         ffi_main, ffi_lib = chelper.get_ffi()
@@ -741,7 +741,7 @@ class MmuHoming(Homing, object):
         # Perform first home
         endstops = [es for rail in rails for es in rail.get_endstops()]
         hi = rails[0].get_homing_info()
-        hmove = HomingMove(self.printer, endstops, self.toolhead) # Happy Hare: Override default toolhead
+        hmove = HomingMove(self.printer, endstops, self.toolhead) # Hapopy Hare: Override default toolhead
         hmove.homing_move(homepos, hi.speed)
         # Perform second home
         if hi.retract_dist:
@@ -758,7 +758,7 @@ class MmuHoming(Homing, object):
             startpos = [rp - ad * retract_r
                         for rp, ad in zip(retractpos, axes_d)]
             self.toolhead.set_position(startpos)
-            hmove = HomingMove(self.printer, endstops, self.toolhead) # Happy Hare: Override default toolhead
+            hmove = HomingMove(self.printer, endstops, self.toolhead) # Hapopy Hare: Override default toolhead
             hmove.homing_move(homepos, hi.second_homing_speed)
             if hmove.check_no_movement() is not None:
                 raise self.printer.command_error(

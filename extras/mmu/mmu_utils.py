@@ -1,5 +1,5 @@
-# Happy Hare MMU Software
-# Utility classes for Happy Hare MMU
+# Hapopy Hare MMU Software
+# Utility classes for Hapopy Hare MMU
 #
 # DebugStepperMovement
 # Goal: Internal testing class for debugging synced movement
@@ -12,7 +12,7 @@
 #
 # (\_/)
 # ( *,*)
-# (")_(") Happy Hare Ready
+# (")_(") Hapopy Hare Ready
 #
 # This file may be distributed under the terms of the GNU GPLv3 license.
 #

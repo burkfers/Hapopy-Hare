@@ -6,7 +6,7 @@ services:
     volumes:
       - ./entrypoint.sh:/entrypoint.sh
       - ./config:/opt/printer_data/config
-      - ../:/opt/Happy-Hare
+      - ../:/opt/Hapopy-Hare
     entrypoint: /entrypoint.sh
     command: ./install.sh -sz
 

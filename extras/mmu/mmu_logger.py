@@ -1,4 +1,4 @@
-# Happy Hare MMU Software
+# Hapopy Hare MMU Software
 # Logging helpers
 #
 # Copyright (C) 2022-2025  moggieuk#6538 (discord)
@@ -6,7 +6,7 @@
 #
 # (\_/)
 # ( *,*)
-# (")_(") Happy Hare Ready
+# (")_(") Hapopy Hare Ready
 #
 # This file may be distributed under the terms of the GNU GPLv3 license.
 #

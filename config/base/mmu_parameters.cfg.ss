@@ -1,5 +1,5 @@
 ########################################################################################################################
-# Happy Hare MMU Software
+# Hapopy Hare MMU Software
 #
 # Template file for MMU's with Servo Selector (Type-A designs like PicoMMU and MMX)
 # This file omits selector and selector-servo parts of the configuration and a few other options that don't make sense
@@ -14,14 +14,14 @@
 #
 # (\_/)
 # ( *,*)
-# (")_(") Happy Hare Ready
+# (")_(") Hapopy Hare Ready
 #
 # Notes:
 #   Macro configuration is specified separately in 'mmu_macro_vars.cfg'.
-#   Full details in https://github.com/moggieuk/Happy-Hare/tree/main/doc/configuration.md
+#   Full details in https://github.com/moggieuk/Hapopy-Hare/tree/main/doc/configuration.md
 #
 [mmu]
-happy_hare_version: {happy_hare_version}			# Don't mess, used for upgrade detection
+hapopy_hare_version: {hapopy_hare_version}			# Don't mess, used for upgrade detection
 
 # MMU Hardware Limits --------------------------------------------------------------------------------------------------
 # ██╗     ██╗███╗   ███╗██╗████████╗███████╗
@@ -110,7 +110,7 @@ extruder_sync_load_speed: 18		# mm/s speed of synchronized extruder load moves
 extruder_sync_unload_speed: 18		# mm/s speed of synchronized extruder unload moves
 extruder_homing_speed: 18		# mm/s speed of extruder only homing moves (e.g. to toolhead sensor)
 
-# When Happy Hare calls out to a macro for user customization and for parking moves these settings are applied and the previous
+# When Hapopy Hare calls out to a macro for user customization and for parking moves these settings are applied and the previous
 # values automatically restored afterwards. This allows for deterministic movement speed regardless of the starting state.
 #
 macro_toolhead_max_accel: 0		# Default printer toolhead acceleration applied when macros are run. 0 = use printer max
@@ -182,13 +182,13 @@ bowden_pre_unload_error_tolerance: 50
 # ███████╗██╔╝ ██╗   ██║██╗    ██║  ██║╚██████╔╝██║ ╚═╝ ██║██║██║ ╚████║╚██████╔╝
 # ╚══════╝╚═╝  ╚═╝   ╚═╝╚═╝    ╚═╝  ╚═╝ ╚═════╝ ╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝ ╚═════╝ 
 #
-# Happy Hare needs a reference "homing point" close to the extruder from which to accurately complete the loading of
+# Hapopy Hare needs a reference "homing point" close to the extruder from which to accurately complete the loading of
 # the toolhead. This homing operation takes place after the fast bowden load and it is anticipated that that load
 # operation will leave the filament just shy of the homing point. If using a toolhead sensor this initial extruder
 # homing is unnecessary (but can be forced) because the homing will occur inside the extruder for the optimum in accuracy.
 # You still should set this homing method because it is also used for the determination and calibration of bowden length.
 #
-# In addition to an entry sensor "extruder" it is possible for Happy Hare to "feel" for the extruder gear entry
+# In addition to an entry sensor "extruder" it is possible for Hapopy Hare to "feel" for the extruder gear entry
 # by colliding with it. This can be done with encoder based collision detection, the compression of the sync-feedback
 # (aka buffer) sensor or using "touch" (stallguard) on the gear stepper. Note that encoder collision detection is not
 # completely deterministic and you will have to find the sweetspot for your setup by adjusting the TMC current reduction.
@@ -240,12 +240,12 @@ extruder_force_homing: 0
 toolhead_homing_max: 40			# Maximum distance to advance in order to attempt to home to defined homing endstop
 
 # IMPORTANT: These next three settings are based on the physical dimensions of your toolhead
-# Once a homing position is determined, Happy Hare needs to know the final move distance to the nozzle. There is only
+# Once a homing position is determined, Hapopy Hare needs to know the final move distance to the nozzle. There is only
 # one correct value for your setup - use 'toolhead_ooze_reduction' (which corresponds to the residual filament left in
 # your nozzle) to control excessive oozing on load. See doc for table of proposed values for common configurations.
 #
 # NOTE: If you have a toolhead sensor you can automate the calculation of these parameters! Read about the
-# `MMU_CALIBRATE_TOOLHEAD` command (https://github.com/moggieuk/Happy-Hare/wiki/Blobbing-and-Stringing#---calibrating-toolhead)
+# `MMU_CALIBRATE_TOOLHEAD` command (https://github.com/moggieuk/Hapopy-Hare/wiki/Blobbing-and-Stringing#---calibrating-toolhead)
 #
 toolhead_extruder_to_nozzle: 72		# Distance from extruder gears (entrance) to nozzle
 toolhead_sensor_to_nozzle: 62		# Distance from toolhead sensor to nozzle (ignored if not fitted)
@@ -296,10 +296,10 @@ toolhead_move_error_tolerance: 60
 #    ╚═╝   ╚═╝╚═╝         ╚═╝      ╚═════╝ ╚═╝  ╚═╝╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝ ╚═════╝ 
 #
 # Tip forming responsibility can be split between slicer (in-print) and standalone macro (not in-print) or forced to always
-# be done by Happy Hare's standalone macro. Since you always need the option to form tips without the slicer so it is
-# generally easier to completely turn off the slicer, force "standalone" tip forming and tune only in Happy Hare.
+# be done by Hapopy Hare's standalone macro. Since you always need the option to form tips without the slicer so it is
+# generally easier to completely turn off the slicer, force "standalone" tip forming and tune only in Hapopy Hare.
 #
-# When Happy Hare is asked to form a tip it will run the referenced macro. Two are reference examples are provided but
+# When Hapopy Hare is asked to form a tip it will run the referenced macro. Two are reference examples are provided but
 # you can implement your own:
 #   _MMU_FORM_TIP .. default tip forming similar to popular slicers like Superslicer and Prusaslicer
 #   _MMU_CUT_TIP  .. for Filametrix (ERCFv2) or similar style toolhead filament cutting system
@@ -307,7 +307,7 @@ toolhead_move_error_tolerance: 60
 # Often it is useful to increase the extruder current for the rapid movement to ensure high torque and no skipped steps
 #
 # If opting for slicer tip forming you MUST configure where the slicer leaves the filament in the extruder since
-# there is no way to determine this. This can be ignored if all tip forming is performed by Happy Hare
+# there is no way to determine this. This can be ignored if all tip forming is performed by Hapopy Hare
 #
 force_form_tip_standalone: 1		 # 0 = Slicer in print else standalone, 1 = Always standalone tip forming (TURN SLICER OFF!)
 form_tip_macro: _MMU_FORM_TIP            # Name of macro to call to perform the tip forming (or cutting) operation
@@ -363,7 +363,7 @@ endless_spool_eject_gate: -1		# Which gate to eject the filament remains. -1 = c
 #endless_spool_groups:			# Default EndlessSpool groups (see later in file)
 #
 # Spoolman support requires you to correctly enable spoolman with moonraker first. If enabled, the gate SpoolId will
-# be used to load filament details and color from the spoolman database and Happy Hare will activate/deactivate
+# be used to load filament details and color from the spoolman database and Hapopy Hare will activate/deactivate
 # spools as they are used. The enabled variation allows for either the local map or the spoolman map to be the
 # source of truth as well as just fetching filament attributes. See this table for explanation:
 #
@@ -386,7 +386,7 @@ pending_spool_id_timeout: 20            # Seconds after which this pending spool
 #    allgates - Color from all the tools in the gate map after running through the TTG map
 #    gatemap  - As per gatemap but hide empty tools
 #
-# Note: Happy Hare will also add the 'spool_id' variable to the Tx macro if spoolman is enabled
+# Note: Hapopy Hare will also add the 'spool_id' variable to the Tx macro if spoolman is enabled
 #
 t_macro_color: slicer			# 'slicer' = default | 'allgates' = mmu | 'gatemap' = mmu without empty gates
 
@@ -425,7 +425,7 @@ console_stat_rows: total, total_average, job, job_average, last
 # How you'd want to see the state of the gates and how they're performing
 #   string     - poor, good, perfect, etc..
 #   percentage - rate of success
-#   emoticon   - fun sad to happy faces (python3 only)
+#   emoticon   - fun sad to hapopy faces (python3 only)
 console_gate_stat: emoticon
 
 # Always display the full statistics table
@@ -464,7 +464,7 @@ show_error_dialog: 0		# 1 = show pop-up dialog in addition to console message, 0
 strict_filament_recovery: 0	# If enabled with MMU with toolhead sensor, this will cause filament position recovery to
 				# perform extra moves to look for filament trapped in the space after extruder but before sensor
 filament_recovery_on_pause: 1	# 1 = Run a quick check to determine current filament position on pause/error, 0 = disable
-retry_tool_change_on_error: 0	# Whether to automatically retry a failed tool change. If enabled Happy Hare will perform
+retry_tool_change_on_error: 0	# Whether to automatically retry a failed tool change. If enabled Hapopy Hare will perform
 				# the equivalent of 'MMU_RECOVER' + 'Tx' commands which usually is all that is necessary
 				# to recover. Note that enabling this can mask problems with your MMU
 bypass_autoload: 1		# If extruder sensor fitted this controls the automatic loading of extruder for bypass operation
@@ -474,7 +474,7 @@ has_filament_buffer: 1          # Whether the MMU has a filament buffer. Set to 
 #
 encoder_move_validation: 1	# ADVANCED: 1 = Normally Encoder validates move distances are within given tolerance
 				#           0 = Validation is disabled (eliminates slight pause between moves but less safe)
-print_start_detection: 1	# ADVANCED: Enabled for Happy Hare to automatically detect start and end of print and call
+print_start_detection: 1	# ADVANCED: Enabled for Hapopy Hare to automatically detect start and end of print and call
 				# ADVANCED: MMU_START_PRINT and MMU_END_PRINT automatically. Harmless to leave enabled but can disable
                                 #           if you think it is causing problems and known START/END is covered in your macros
 extruder: extruder		# ADVANCED: Name of the toolhead extruder that MMU is using
@@ -491,7 +491,7 @@ gcode_unload_sequence: 0	# VERY ADVANCED: Gcode unloading sequence, 1=enabled, 0
 # ╚═╝  ╚═╝╚══════╝╚═╝╚═╝     ╚═╝     ╚══════╝╚═╝  ╚═╝
 #
 # Timer too close is a catch all error, however it has been found to occur on some systems during homing and probing
-# operations especially so with CANbus connected MCUs. Happy Hare uses many homing moves for reliable extruder loading
+# operations especially so with CANbus connected MCUs. Hapopy Hare uses many homing moves for reliable extruder loading
 # and unloading and enabling this option affords klipper more tolerance and avoids this dreaded error
 #
 update_trsync: 0		# 1 = Increase TRSYNC_TIMEOUT, 0 = Leave the klipper default

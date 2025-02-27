@@ -1,4 +1,4 @@
-# Happy Hare MMU Software
+# Hapopy Hare MMU Software
 # Main module
 #
 # Copyright (C) 2022-2025  moggieuk#6538 (discord)
@@ -8,7 +8,7 @@
 #
 # (\_/)
 # ( *,*)
-# (")_(") Happy Hare Ready
+# (")_(") Hapopy Hare Ready
 #
 # This file may be distributed under the terms of the GNU GPLv3 license.
 #
@@ -19,7 +19,7 @@ import chelper
 from ..homing            import Homing, HomingMove
 from ..tmc               import TMCCommandHelper
 
-# Happy Hare imports
+# Hapopy Hare imports
 from ..                  import mmu_machine
 from ..mmu_machine       import MmuToolHead
 from ..mmu_sensors       import MmuRunoutHelper
@@ -35,7 +35,7 @@ from .mmu_sensor_manager import MmuSensorManager
 
 # Main klipper module
 class Mmu:
-    VERSION = 3.10 # When this is revved, Happy Hare will instruct users to re-run ./install.sh. Sync with install.sh!
+    VERSION = 3.10 # When this is revved, Hapopy Hare will instruct users to re-run ./install.sh. Sync with install.sh!
 
     BOOT_DELAY = 2.5 # Delay before running bootup tasks
 
@@ -77,7 +77,7 @@ class Mmu:
 
     FORM_TIP_NONE = 0               # Skip tip forming
     FORM_TIP_SLICER = 1             # Slicer forms tips
-    FORM_TIP_STANDALONE = 2         # Happy Hare forms tips (default)
+    FORM_TIP_STANDALONE = 2         # Hapopy Hare forms tips (default)
 
     ACTION_IDLE = 0
     ACTION_LOADING = 1
@@ -237,7 +237,7 @@ class Mmu:
                   ('tan','#D2B48C'), ('teal','#008080'), ('thistle','#D8BFD8'), ('tomato','#FF6347'), ('turquoise','#40E0D0'), ('violet','#EE82EE'),
                   ('wheat','#F5DEB3'), ('white','#FFFFFF'), ('whitesmoke','#F5F5F5'), ('yellow','#FFFF00'), ('yellowgreen','#9ACD32')]
 
-    UPGRADE_REMINDER = "Sorry but Happy Hare requires you to re-run this to complete the update:\ncd ~/Happy-Hare\n./install.sh\nMore details: https://github.com/moggieuk/Happy-Hare/wiki/Upgrade-Notice"
+    UPGRADE_REMINDER = "Sorry but Hapopy Hare requires you to re-run this to complete the update:\ncd ~/Hapopy-Hare\n./install.sh\nMore details: https://github.com/moggieuk/Hapopy-Hare/wiki/Upgrade-Notice"
 
     def __init__(self, config):
         self.config = config
@@ -270,7 +270,7 @@ class Mmu:
         self.printer.register_event_handler("klippy:ready", self.handle_ready)
 
         # Instruct users to re-run ./install.sh if version number changes
-        self.config_version = config.getfloat('happy_hare_version', 2.2) # v2.2 was the last release before versioning
+        self.config_version = config.getfloat('hapopy_hare_version', 2.2) # v2.2 was the last release before versioning
         if self.config_version is not None and self.config_version < self.VERSION:
             raise self.config.error("Looks like you upgraded (v%s -> v%s)?\n%s" % (self.config_version, self.VERSION, self.UPGRADE_REMINDER))
 
@@ -460,7 +460,7 @@ class Mmu:
 
         # Klipper tuning (aka hacks)
         # Timer too close is a catch all error, however it has been found to occur on some systems during homing and probing
-        # operations especially so with CANbus connected mcus. Happy Hare using many homing moves for reliable extruder loading
+        # operations especially so with CANbus connected mcus. Hapopy Hare using many homing moves for reliable extruder loading
         # and unloading and enabling this option affords klipper more tolerance and avoids this dreaded error.
         self.update_trsync = config.getint('update_trsync', 0, minval=0, maxval=1)
 
@@ -1873,7 +1873,7 @@ class Mmu:
         on_off = lambda x: "ON" if x else "OFF"
 
         fversion = lambda f: "v{}.".format(int(f)) + '.'.join("{:0<1}".format(d) for d in str(f).split('.')[1])
-        msg = "MMU: Happy Hare %s running %s v%s" % (fversion(self.config_version), self.mmu_machine.mmu_vendor, self.mmu_machine.mmu_version_string)
+        msg = "MMU: Hapopy Hare %s running %s v%s" % (fversion(self.config_version), self.mmu_machine.mmu_vendor, self.mmu_machine.mmu_version_string)
         msg += " with %d gates" % self.num_gates
         msg += (" over %d units" % self.mmu_machine.num_units) if self.mmu_machine.num_units > 1 else ""
         msg += " (%s)" % ("DISABLED" if not self.is_enabled else "PAUSED" if self.is_mmu_paused() else "OPERATIONAL")
@@ -3011,7 +3011,7 @@ class Mmu:
             self.sync_gear_to_extruder(self.sync_to_extruder, grip=True, current=True)
             self.wrap_gcode_command("SET_GCODE_VARIABLE MACRO=%s VARIABLE=min_lifted_z VALUE=0" % self.park_macro) # Sequential printing movement "floor"
             self.wrap_gcode_command("SET_GCODE_VARIABLE MACRO=%s VARIABLE=next_pos VALUE=False" % self.park_macro)
-            msg = "Happy Hare initialized ready for print"
+            msg = "Hapopy Hare initialized ready for print"
             if self.filament_pos == self.FILAMENT_POS_LOADED:
                 msg += " (initial tool T%s loaded)" % self.tool_selected
             else:
@@ -3172,7 +3172,7 @@ class Mmu:
             if not self.saved_toolhead_operation:
                 # Save toolhead position
 
-                # This is paranoia so I can be absolutely sure that Happy Hare leaves toolhead the same way when we are done
+                # This is paranoia so I can be absolutely sure that Hapopy Hare leaves toolhead the same way when we are done
                 gcode_pos = self.gcode_move.get_status(eventtime)['gcode_position']
                 toolhead_gcode_pos = " ".join(["%s:%.1f" % (a, v) for a, v in zip("XYZE", gcode_pos)])
                 self.log_debug("Saving toolhead gcode state and position (%s) for %s" % (toolhead_gcode_pos, operation))
@@ -3562,7 +3562,7 @@ class Mmu:
 
             if new_target_temp < klipper_minimum_temp:
                 # If, for some reason, the target temp is below Klipper's minimum, set to minimum
-                # set the target to Happy Hare's default. This strikes a balance between utility
+                # set the target to Hapopy Hare's default. This strikes a balance between utility
                 # and safety since Klipper's min is truly a bare minimum but our default should be
                 # a more realistic temperature for safe operation.
                 new_target_temp = default_extruder_temp
@@ -3692,7 +3692,7 @@ class Mmu:
         slicer = gcmd.get_int('SLICER', 0, minval=0, maxval=1)
         callbacks = gcmd.get_int('CALLBACKS', 0, minval=0, maxval=1)
         steps = gcmd.get_int('STEPS', 0, minval=0, maxval=1)
-        msg = "Happy Hare MMU commands: (use MMU_HELP SLICER=1 CALLBACKS=1 TESTING=1 STEPS=1 for full command set)\n"
+        msg = "Hapopy Hare MMU commands: (use MMU_HELP SLICER=1 CALLBACKS=1 TESTING=1 STEPS=1 for full command set)\n"
         tesing_msg = "\nCalibration and testing commands:\n"
         slicer_msg = "\nPrint start/end or slicer macros (defined in mmu_software.cfg\n"
         callback_msg = "\nCallbacks (defined in mmu_sequence.cfg, mmu_state.cfg)\n"
@@ -5451,7 +5451,7 @@ class Mmu:
             self._restore_gear_current()
 
     # This is used to protect the in print synchronization state and is used as an outermost wrapper for calls back
-    # into Happy Hare during a print. It also ensures that grip (e.g. servo) and current are correctly restored
+    # into Hapopy Hare during a print. It also ensures that grip (e.g. servo) and current are correctly restored
     @contextlib.contextmanager
     def wrap_sync_gear_to_extruder(self):
         self._standalone_sync = prev_sync = self.mmu_machine.filament_always_gripped or self.mmu_toolhead.sync_mode == MmuToolHead.GEAR_SYNCED_TO_EXTRUDER

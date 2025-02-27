@@ -1,4 +1,4 @@
-# Happy Hare MMU Software
+# Hapopy Hare MMU Software
 # Wrapper around led_effect klipper module to replicate any effect on entire strip as well
 # as on each individual LED for per-gate effects. This relies on a previous shared
 # [mmu_leds] section for the shared part of the config
@@ -8,7 +8,7 @@
 #
 # (\_/)
 # ( *,*)
-# (")_(") Happy Hare Ready
+# (")_(") Hapopy Hare Ready
 #
 # This file may be distributed under the terms of the GNU GPLv3 license.
 #

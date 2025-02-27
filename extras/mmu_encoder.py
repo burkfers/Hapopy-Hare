@@ -1,4 +1,4 @@
-# Happy Hare MMU Software
+# Hapopy Hare MMU Software
 # Driver for encoder that supports movement measurement, runout/clog detection and flow rate calc
 #
 # Copyright (C) 2022-2025  moggieuk#6538 (discord)
@@ -11,7 +11,7 @@
 #
 # (\_/)
 # ( *,*)
-# (")_(") Happy Hare Ready
+# (")_(") Hapopy Hare Ready
 #
 # This file may be distributed under the terms of the GNU GPLv3 license.
 #
@@ -38,7 +38,7 @@ class MmuEncoder:
         # For counter functionality
         self.sample_time = config.getfloat('sample_time', 0.1, above=0.)
         self.poll_time = config.getfloat('poll_time', 0.001, above=0.)
-        self.set_resolution(config.getfloat('encoder_resolution', 1., above=0.)) # Must be calibrated by user in Happy Hare
+        self.set_resolution(config.getfloat('encoder_resolution', 1., above=0.)) # Must be calibrated by user in Hapopy Hare
         self._last_time = None
         self._counts = self._last_count = 0
         self._counter = pulse_counter.MCU_counter(self.printer, encoder_pin, self.sample_time, self.poll_time)

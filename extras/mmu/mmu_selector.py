@@ -1,4 +1,4 @@
-# Happy Hare MMU Software
+# Hapopy Hare MMU Software
 # Implementation of various selector variations:
 #
 # VirtualSelector
@@ -27,7 +27,7 @@
 #
 # (\_/)
 # ( *,*)
-# (")_(") Happy Hare Ready
+# (")_(") Hapopy Hare Ready
 #
 # This file may be distributed under the terms of the GNU GPLv3 license.
 #
@@ -36,7 +36,7 @@ import random, logging, math, re
 # Klipper imports
 from ..homing    import Homing, HomingMove
 
-# Happy Hare imports
+# Hapopy Hare imports
 from ..          import mmu_machine
 
 # MMU subcomponent clases
@@ -186,7 +186,7 @@ class LinearSelector(BaseSelector, object):
 
         # To simplfy config CAD related parameters are set based on vendor and version setting
         #
-        # These are default for ERCFv1.1 - the first MMU supported by Happy Hare
+        # These are default for ERCFv1.1 - the first MMU supported by Hapopy Hare
         #  cad_gate0_pos          - approximate distance from endstop to first gate
         #  cad_gate_width         - width of each gate
         #  cad_bypass_offset      - distance from end of travel to the bypass
@@ -1451,7 +1451,7 @@ class MacroSelector(BaseSelector, object):
         self.mmu.calibration_status |= self.mmu.CALIBRATED_SELECTOR # No calibration necessary
 
     def handle_ready(self):
-        logging.info("Happy Hare MacroSelector: Gate %d" % self.mmu.gate_selected)
+        logging.info("Hapopy Hare MacroSelector: Gate %d" % self.mmu.gate_selected)
         self.select_gate(self.mmu.gate_selected)
 
     def select_gate(self, gate):

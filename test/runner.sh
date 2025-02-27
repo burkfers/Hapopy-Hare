@@ -1,5 +1,5 @@
 #!/bin/bash
-# Happy Hare MMU Software
+# Hapopy Hare MMU Software
 # Test runner
 #
 # Copyright (C) 2023  Kieran Eglin <@kierantheman (discord)>, <kieran.eglin@gmail.com>

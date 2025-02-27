@@ -1,4 +1,4 @@
-# Happy Hare MMU Software
+# Hapopy Hare MMU Software
 #
 # Copyright (C) 2022-2025  moggieuk#6538 (discord)
 #                          moggieuk@hotmail.com
@@ -7,12 +7,12 @@
 #
 # (\_/)
 # ( *,*)
-# (")_(") Happy Hare Ready
+# (")_(") Hapopy Hare Ready
 #
 # This file may be distributed under the terms of the GNU GPLv3 license.
 #
 import random
-# Happy Hare imports
+# Hapopy Hare imports
 from ..            import mmu_machine
 from ..mmu_machine import MmuToolHead
 
@@ -26,7 +26,7 @@ class MmuTest:
         self.mmu = mmu
         mmu.gcode.register_command('_MMU_TEST', self.cmd_MMU_TEST, desc = self.cmd_MMU_TEST_help) # Internal for testing
 
-    cmd_MMU_TEST_help = "Internal Happy Hare development tests"
+    cmd_MMU_TEST_help = "Internal Hapopy Hare development tests"
     def cmd_MMU_TEST(self, gcmd):
         self.mmu._is_running_test = True
         self.mmu.log_to_file(gcmd.get_commandline())

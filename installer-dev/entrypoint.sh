@@ -6,7 +6,7 @@ set -x
 if [ ! -f "${HOME}/printer_data/config/printer.cfg" ]; then
     echo '# Printer Config' >> "${HOME}/printer_data/config/printer.cfg"
 fi
-cd ~/Happy-Hare
+cd ~/Hapopy-Hare
 
 # run all the arguments as the command
 exec "$@"

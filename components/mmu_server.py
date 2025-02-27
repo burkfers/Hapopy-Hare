@@ -1,4 +1,4 @@
-# Happy Hare MMU Software
+# Hapopy Hare MMU Software
 # Moonraker support for a file-preprocessor that injects MMU metadata into gcode files
 #
 # Copyright (C) 2022-2025  moggieuk#6538 (discord)
@@ -63,7 +63,7 @@ class MmuServer:
         self.spool_location = {}
 
         self.nb_gates = None             # Set during initialization to the size of the MMU or 1 if standalone
-        self.cache_lock = asyncio.Lock() # Lock to serialize a async calls for Happy Hare
+        self.cache_lock = asyncio.Lock() # Lock to serialize a async calls for Hapopy Hare
 
         # Spoolman filament info retrieval functionality and update reporting
         if self.spoolman:
@@ -98,7 +98,7 @@ class MmuServer:
 
     async def component_init(self) -> None:
         if self.spoolman is None:
-            logging.warning("Spoolman not available. Happy Hare remote methods not available")
+            logging.warning("Spoolman not available. Hapopy Hare remote methods not available")
             return
 
         # Get current printer hostname
@@ -135,7 +135,7 @@ class MmuServer:
                 self.spoolman_has_extras = extras
 
             elif self.spoolman_version:
-                logging.error(f"Could not initialize Spoolman db for Happy Hare. Spoolman db version too old (found {self.spoolman_version} < {MIN_SM_VER})")
+                logging.error(f"Could not initialize Spoolman db for Hapopy Hare. Spoolman db version too old (found {self.spoolman_version} < {MIN_SM_VER})")
             else:
                 logging.error("Could not connect to Spoolman db. Perhaps it is not initialized yet? Will try again on next request")
                 return False
@@ -400,7 +400,7 @@ class MmuServer:
     async def _send_gate_map_update(self, gate_ids, replace=False, silent=False) -> bool:
         '''
         Retrieve filament attributes for list of (gate, spool_id) tuples
-        Pass back to Happy Hare.
+        Pass back to Hapopy Hare.
 
         If no mmu backend has been detected, ignore the request
         '''
@@ -433,7 +433,7 @@ class MmuServer:
     async def get_filaments(self, gate_ids, silent=False) -> bool:
         '''
         Retrieve filament attributes for list of (gate, spool_id) tuples
-        Pass back to Happy Hare. Does not require extended Spoolman db
+        Pass back to Hapopy Hare. Does not require extended Spoolman db
         '''
         async with self.cache_lock:
             return await self._send_gate_map_update(gate_ids, silent=silent)
@@ -442,7 +442,7 @@ class MmuServer:
         '''
         Store the gate map for the printer for a list of (gate, spool_id) tuples.
         This attempts to reduce the number of necessary tasks and then run them in parallel
-        Then updates Happy Hare with filament attributes
+        Then updates Hapopy Hare with filament attributes
         '''
         if not await self._check_init_spoolman(): return
         async with self.cache_lock:
@@ -498,13 +498,13 @@ class MmuServer:
                         self.server.send_event("spoolman:set_spool_gate", {"spool_id": sid, "printer": self.printer_hostname, "gate": gate})
                         await self._log_n_send(f"Spool {sid} assigned to printer {self.printer_hostname} @ gate {gate} in Spoolman db", silent=silent)
 
-            # Send update of filament attributes back to Happy Hare
+            # Send update of filament attributes back to Hapopy Hare
             return await self._send_gate_map_update(gate_ids, silent=silent)
 
     async def pull_gate_map(self, silent=False) -> bool:
         '''
         Get all spools assigned to the current printer from Spoolman db and map them to gates
-        Pass back to Happy Hare
+        Pass back to Hapopy Hare
         '''
         if not await self._check_init_spoolman(): return
         async with self.cache_lock:
@@ -610,7 +610,7 @@ class MmuServer:
                         self.server.send_event("spoolman:set_spool_gate", {"spool_id": sid, "printer": self.printer_hostname, "gate": gate})
                         await self._log_n_send(f"Spool {sid} assigned to printer {self.printer_hostname} @ gate {gate} in Spoolman db", silent=silent)
 
-            # Sync with Happy Hare if required
+            # Sync with Hapopy Hare if required
             if sync and updated_gate_ids:
                 gate_ids = [(gate, spool_id) for gate, spool_id in updated_gate_ids.items()]
                 return await self._send_gate_map_update(gate_ids, replace=True, silent=silent)
@@ -652,7 +652,7 @@ class MmuServer:
                     self.server.send_event("spoolman:unset_spool_gate", {"spool_id": sid, "old_printer": self.printer_hostname, "old_gate": gate})
                     await self._log_n_send(f"Spool {sid} unassigned from printer {old_printer} and gate {old_gate} in Spoolman db", silent=silent)
 
-            # Sync with Happy Hare if required
+            # Sync with Hapopy Hare if required
             if sync and updated_gate_ids:
                 gate_ids = [(gate, spool_id) for gate, spool_id in updated_gate_ids.items()]
                 return await self._send_gate_map_update(gate_ids, replace=True, silent=silent)
@@ -749,8 +749,8 @@ def load_component(config):
 #
 AUTHORZIED_SLICERS = ['PrusaSlicer', 'SuperSlicer', 'OrcaSlicer', 'BambuStudio']
 
-HAPPY_HARE_FINGERPRINT = "; processed by HappyHare"
-MMU_REGEX = r"^" + HAPPY_HARE_FINGERPRINT
+HAPOPY_HARE_FINGERPRINT = "; processed by HapopyHare"
+MMU_REGEX = r"^" + HAPOPY_HARE_FINGERPRINT
 SLICER_REGEX = r"^;.*generated by ([a-z]*) .*$|^; (BambuStudio) .*$"
 
 TOOL_DISCOVERY_REGEX = r"((^MMU_CHANGE_TOOL(_STANDALONE)? .*?TOOL=)|(^T))(?P<tool>\d{1,2})"
@@ -786,7 +786,7 @@ T_PATTERN  = r'^T(\d+)\s*(?:;.*)?$'
 G1_PATTERN = r'^G[01](?=.*\sX(-?[\d.]+))(?=.*\sY(-?[\d.]+)).*$'
 
 def gcode_processed_already(file_path):
-    """Expects first line of gcode to be the HAPPY_HARE_FINGERPRINT '; processed by HappyHare'"""
+    """Expects first line of gcode to be the HAPOPY_HARE_FINGERPRINT '; processed by HapopyHare'"""
 
     mmu_regex = re.compile(MMU_REGEX, re.IGNORECASE)
 
@@ -949,7 +949,7 @@ def process_file(input_filename, output_filename, insert_nextpos, tools_used, to
     with open(input_filename, 'r') as infile, open(output_filename, 'w') as outfile:
         buffer = [] # Buffer lines between a "T" line and the next matching "G1" line
         tool = None # Store the tool number from a "T" line
-        outfile.write(f'{HAPPY_HARE_FINGERPRINT}\n')
+        outfile.write(f'{HAPOPY_HARE_FINGERPRINT}\n')
 
         for line in infile:
             line = add_placeholder(line, tools_used, total_toolchanges, colors, temps, materials, purge_volumes, filament_names)
@@ -1073,7 +1073,7 @@ if __name__ == "__main__":
     parser.add_argument("-p", "--path", default=os.path.abspath(os.path.dirname(__file__)), metavar='<path>', help="optional absolute path for file")
     parser.add_argument("-u", "--ufp", metavar="<ufp file>", default=None, help="optional path of ufp file to extract")
     parser.add_argument("-o", "--check-objects", dest='check_objects', action='store_true', help="process gcode file for exclude object functionality")
-    parser.add_argument("-m", "--placeholders", dest='placeholders', action='store_true', help="process happy hare mmu placeholders")
+    parser.add_argument("-m", "--placeholders", dest='placeholders', action='store_true', help="process hapopy hare mmu placeholders")
     parser.add_argument("-n", "--nextpos", dest='nextpos', action='store_true', help="add next position to tool change")
     args = parser.parse_args()
     config: Dict[str, Any] = {}

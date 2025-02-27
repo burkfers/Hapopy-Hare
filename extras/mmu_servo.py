@@ -1,4 +1,4 @@
-# Happy Hare MMU Software
+# Hapopy Hare MMU Software
 # Custom servo support that carefully synchronizes PWM changes to avoid "kickback" caused
 # by a truncated final pulse with digital servos.
 # All existing servo functionality is available with the addition of a 'DURATION'
@@ -11,7 +11,7 @@
 #
 # (\_/)
 # ( *,*)
-# (")_(") Happy Hare Ready
+# (")_(") Hapopy Hare Ready
 #
 # This file may be distributed under the terms of the GNU GPLv3 license.
 #

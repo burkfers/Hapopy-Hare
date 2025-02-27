@@ -1,5 +1,5 @@
 #!/bin/bash
-# Happy Hare MMU Software
+# Hapopy Hare MMU Software
 #
 # Installer / Updater script
 #
@@ -105,7 +105,7 @@ sad_logo=$(cat <<EOF
 ${INFO}
 (\_/)
 ( v,v)
-(")^(") Very Unhappy Hare
+(")^(") Very Unhapopy Hare
 ${OFF}
 EOF
 )
@@ -147,7 +147,7 @@ self_update() {
     set +e
     git diff --quiet --exit-code "origin/$BRANCH"
     if [ $? -eq 1 ]; then
-        echo -e "${B_GREEN}Found a new version of Happy Hare on github, updating..."
+        echo -e "${B_GREEN}Found a new version of Hapopy Hare on github, updating..."
         [ -n "$(git status --porcelain)" ] && {
             git stash push -m 'local changes stashed before self update' --quiet
         }
@@ -910,7 +910,7 @@ copy_config_files() {
             fi
 
             # Ensure that supplemental user added params are retained. These are those that are
-            # by default set internally in Happy Hare based on vendor and version settings but
+            # by default set internally in Hapopy Hare based on vendor and version settings but
             # can be overridden.  This set also includes a couple of hidden test parameters.
             echo "" >> $dest
             echo "# SUPPLEMENTAL USER CONFIG retained after upgrade --------------------------------------------------------------------" >> $dest
@@ -1091,21 +1091,21 @@ install_update_manager() {
     if [ -f "${file}" ]; then
         restart=0
 
-        update_section=$(grep -c '\[update_manager happy-hare\]' ${file} || true)
+        update_section=$(grep -c '\[update_manager hapopy-hare\]' ${file} || true)
         if [ "${update_section}" -eq 0 ]; then
             echo "" >> "${file}"
             while read -r line; do
                 echo -e "${line}" >> "${file}"
             done < "${SRCDIR}/moonraker_update.txt"
             echo "" >> "${file}"
-            # The path for Happy-Hare on MIPS is /usr/data/Happy-Hare
+            # The path for Hapopy-Hare on MIPS is /usr/data/Hapopy-Hare
             if [ "$IS_MIPS" -eq 1 ]; then
-                sed -i 's|path: ~/Happy-Hare|path: /usr/data/Happy-Hare|' "${file}"
-                echo -e "${INFO}Update Happy-Hare path for MIPS architecture."
+                sed -i 's|path: ~/Hapopy-Hare|path: /usr/data/Hapopy-Hare|' "${file}"
+                echo -e "${INFO}Update Hapopy-Hare path for MIPS architecture."
             fi
             restart=1
         else
-            echo -e "${WARNING}[update_manager happy-hare] already exists in moonraker.conf - skipping install"
+            echo -e "${WARNING}[update_manager hapopy-hare] already exists in moonraker.conf - skipping install"
         fi
 
         # Quick "catch-up" update for new mmu_service
@@ -1143,12 +1143,12 @@ uninstall_update_manager() {
     if [ -f "${file}" ]; then
         restart=0
 
-        update_section=$(grep -c '\[update_manager happy-hare\]' ${file} || true)
+        update_section=$(grep -c '\[update_manager hapopy-hare\]' ${file} || true)
         if [ "${update_section}" -eq 0 ]; then
-            echo -e "${INFO}[update_manager happy-hare] not found in moonraker.conf - skipping removal"
+            echo -e "${INFO}[update_manager hapopy-hare] not found in moonraker.conf - skipping removal"
         else
             cat "${file}" | sed -e " \
-                /\[update_manager happy-hare\]/,+6 d; \
+                /\[update_manager hapopy-hare\]/,+6 d; \
                     " > "${file}.new" && mv "${file}.new" "${file}"
             restart=1
         fi
@@ -1491,7 +1491,7 @@ questionaire() {
             HAS_ENCODER=no
             HAS_SELECTOR=no
             HAS_SERVO=no
-            HELP_URL="https://github.com/moggieuk/Happy-Hare/wiki/Quick-Start-3MS"
+            HELP_URL="https://github.com/moggieuk/Hapopy-Hare/wiki/Quick-Start-3MS"
             HELP_URL_B="https://3dcoded.github.io/3MS/instructions/"
             _hw_mmu_vendor="3MS"
             _hw_mmu_version="1.0"
@@ -1812,7 +1812,7 @@ questionaire() {
 
         if [ "$SETUP_SELECTOR_TOUCH" != "no" ]; then
             echo -e "${PROMPT}${SECTION}Touch selector operation using TMC Stallguard? This allows for additional selector recovery steps but is difficult to tune"
-            echo -e "Not recommend if you are new to MMU/Happy Hare & MCU must have DIAG output for selector stepper. Can configure later${INPUT}"
+            echo -e "Not recommend if you are new to MMU/Hapopy Hare & MCU must have DIAG output for selector stepper. Can configure later${INPUT}"
             yn=$(prompt_yn "Enable selector touch operation")
             echo
             case $yn in
@@ -2023,7 +2023,7 @@ questionaire() {
                     ;;
             esac
 
-            echo -e "${PROMPT}    Recommended: Would you like to include the default pause/resume macros supplied with Happy Hare${INPUT}"
+            echo -e "${PROMPT}    Recommended: Would you like to include the default pause/resume macros supplied with Hapopy Hare${INPUT}"
             yn=$(prompt_yn "    Include client_macros.cfg")
             echo
             case $yn in
@@ -2088,7 +2088,7 @@ questionaire() {
     echo "        * Adjust your config for loading and unloading preferences"
     echo -e "${WARNING}"
     echo "    Make sure you that you have these near the top of your printer.cfg:"
-    echo "        # Happy Hare"
+    echo "        # Hapopy Hare"
     echo "        [include mmu/base/*.cfg]"
     echo "        [include mmu/optional/client_macros.cfg]"
     echo "        [include mmu/addons/blobifier.cfg]"
@@ -2105,7 +2105,7 @@ questionaire() {
     echo "        * Configure your operational preferences in mmu_macro_vars.cfg"
     echo 
     echo "    Good luck! MMU is complex to setup. Remember Discord is your friend.."
-    echo -e "    Join the dedicated Happy Hare forum here: ${EMPHASIZE}https://discord.gg/98TYYUf6f2${INFO}"
+    echo -e "    Join the dedicated Hapopy Hare forum here: ${EMPHASIZE}https://discord.gg/98TYYUf6f2${INFO}"
     if [ -n "${HELP_URL}" ]; then
         echo -e "    Make sure to follow these instructions while setting up your MMU:"
         echo -e "    ${EMPHASIZE}${HELP_URL}"
@@ -2205,7 +2205,7 @@ cleanup_old_klippy_modules
 
 if [ "$UNINSTALL" -eq 0 ]; then
     if [ "${INSTALL}" -eq 1 ]; then
-        echo -e "${TITLE}$(get_logo "Happy Hare interactive installer...")"
+        echo -e "${TITLE}$(get_logo "Hapopy Hare interactive installer...")"
         read_default_config  # Parses template file parameters into memory
         questionaire         # Update in memory parameters from questionaire
 
@@ -2215,7 +2215,7 @@ if [ "$UNINSTALL" -eq 0 ]; then
     else
         hardware_config="${KLIPPER_CONFIG_HOME}/mmu/base/mmu_hardware.cfg"
         if [ -f "${hardware_config}" ]; then
-            echo -e "${TITLE}$(get_logo "Happy Hare upgrading previous install...")"
+            echo -e "${TITLE}$(get_logo "Hapopy Hare upgrading previous install...")"
             read_previous_mmu_type # Get MMU type info first
             read_default_config  # Parses template file parameters into memory
             read_previous_config # Update in memory parameters from previous install
@@ -2224,13 +2224,13 @@ if [ "$UNINSTALL" -eq 0 ]; then
             usage
         else
             # Starter blank install
-            echo -e "${TITLE}$(get_logo "Happy Hare generating skeletal config...")"
+            echo -e "${TITLE}$(get_logo "Hapopy Hare generating skeletal config...")"
             read_default_config  # Parses template file parameters into memory
         fi
     fi
 
     # Important to update version
-    FROM_VERSION=${_param_happy_hare_version}
+    FROM_VERSION=${_param_hapopy_hare_version}
     if [ ! "${FROM_VERSION}" == "" ]; then
         downgrade=$(awk -v to="$VERSION" -v from="$FROM_VERSION" 'BEGIN {print (to < from) ? "1" : "0"}')
         bad_v2v3=$(awk -v to="$VERSION" -v from="$FROM_VERSION" 'BEGIN {print (from < 2.70 && to >= 3.0) ? "1" : "0"}')
@@ -2246,7 +2246,7 @@ if [ "$UNINSTALL" -eq 0 ]; then
             echo -e "${WARNING}Upgrading from version ${FROM_VERSION} to ${VERSION}..."
         fi
     fi
-    _param_happy_hare_version=${VERSION}
+    _param_hapopy_hare_version=${VERSION}
 
     # Copy config files updating from in memory parmameters or h/w settings
     set +e
@@ -2262,9 +2262,9 @@ if [ "$UNINSTALL" -eq 0 ]; then
 
 else
     echo
-    echo -e "${WARNING}You have asked me to remove Happy Hare and cleanup"
+    echo -e "${WARNING}You have asked me to remove Hapopy Hare and cleanup"
     echo
-    yn=$(prompt_yn "Are you sure you want to proceed with deleting Happy Hare?")
+    yn=$(prompt_yn "Are you sure you want to proceed with deleting Hapopy Hare?")
     echo
     case $yn in
         y)
@@ -2272,7 +2272,7 @@ else
             uninstall_update_manager
             uninstall_printer_includes
             uninstall_config_files
-            echo -e "${INFO}Uninstall complete except for the Happy-Hare directory - you can now safely delete that as well"
+            echo -e "${INFO}Uninstall complete except for the Hapopy-Hare directory - you can now safely delete that as well"
             ;;
         n)
             echo -e "${INFO}Well that was a close call!  Everything still intact"
@@ -2297,5 +2297,5 @@ if [ "$UNINSTALL" -eq 1 ]; then
     echo -e "${sad_logo}"
 else
     echo -e "${TITLE}Done."
-    echo -e "$(get_logo "Happy Hare ${F_VERSION} Ready...")"
+    echo -e "$(get_logo "Hapopy Hare ${F_VERSION} Ready...")"
 fi
