@@ -237,7 +237,7 @@ class Mmu:
                   ('tan','#D2B48C'), ('teal','#008080'), ('thistle','#D8BFD8'), ('tomato','#FF6347'), ('turquoise','#40E0D0'), ('violet','#EE82EE'),
                   ('wheat','#F5DEB3'), ('white','#FFFFFF'), ('whitesmoke','#F5F5F5'), ('yellow','#FFFF00'), ('yellowgreen','#9ACD32')]
 
-    UPGRADE_REMINDER = "Sorry but Hapopy Hare requires you to re-run this to complete the update:\ncd ~/Hapopy-Hare\n./install.sh\nMore details: https://github.com/moggieuk/Hapopy-Hare/wiki/Upgrade-Notice"
+    UPGRADE_REMINDER = "Sorry but Hapopy Hare requires you to re-run this to complete the update:\ncd ~/Hapopy-Hare\n./install.sh\nMore details: https://github.com/burkfers/Hapopy-Hare/wiki/Upgrade-Notice"
 
     def __init__(self, config):
         self.config = config

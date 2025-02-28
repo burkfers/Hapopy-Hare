@@ -1491,7 +1491,7 @@ questionaire() {
             HAS_ENCODER=no
             HAS_SELECTOR=no
             HAS_SERVO=no
-            HELP_URL="https://github.com/moggieuk/Hapopy-Hare/wiki/Quick-Start-3MS"
+            HELP_URL="https://github.com/burkfers/Hapopy-Hare/wiki/Quick-Start-3MS"
             HELP_URL_B="https://3dcoded.github.io/3MS/instructions/"
             _hw_mmu_vendor="3MS"
             _hw_mmu_version="1.0"

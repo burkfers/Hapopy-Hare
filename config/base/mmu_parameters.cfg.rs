@@ -18,7 +18,7 @@
 #
 # Notes:
 #   Macro configuration is specified separately in 'mmu_macro_vars.cfg'.
-#   Full details in https://github.com/moggieuk/Hapopy-Hare/tree/main/doc/configuration.md
+#   Full details in https://github.com/burkfers/Hapopy-Hare/tree/main/doc/configuration.md
 #
 [mmu]
 hapopy_hare_version: {hapopy_hare_version}			# Don't mess, used for upgrade detection
@@ -241,7 +241,7 @@ toolhead_homing_max: 40			# Maximum distance to advance in order to attempt to h
 # your nozzle) to control excessive oozing on load. See doc for table of proposed values for common configurations.
 #
 # NOTE: If you have a toolhead sensor you can automate the calculation of these parameters! Read about the
-# `MMU_CALIBRATE_TOOLHEAD` command (https://github.com/moggieuk/Hapopy-Hare/wiki/Blobbing-and-Stringing#---calibrating-toolhead)
+# `MMU_CALIBRATE_TOOLHEAD` command (https://github.com/burkfers/Hapopy-Hare/wiki/Blobbing-and-Stringing#---calibrating-toolhead)
 #
 toolhead_extruder_to_nozzle: 72		# Distance from extruder gears (entrance) to nozzle
 toolhead_sensor_to_nozzle: 62		# Distance from toolhead sensor to nozzle (ignored if not fitted)
