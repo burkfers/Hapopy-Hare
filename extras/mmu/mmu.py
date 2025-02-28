@@ -1204,7 +1204,7 @@ class Mmu:
 
         try:
             # Splash...
-            msg = '{1}(\_/){0}\n{1}( {0}*,*{1}){0}\n{1}(")_("){0} {5}{2}H{0}{3}a{0}{4}p{0}{2}p{0}{3}y{0} {4}H{0}{2}a{0}{3}r{0}{4}e{0} {1}%s{0} {2}R{0}{3}e{0}{4}a{0}{2}d{0}{3}y{0}{1}...{0}{6}' % fversion(self.config_version)
+            msg = '{1}(\_/){0}\n{1}( {0}*,*{1}){0}\n{1}(")_("){0} {5}{2}H{0}{3}a{0}{4}p{0}{2}o{0}{3}p{0}{4}y{0} {2}H{0}{3}a{0}{4}r{0}{2}e{0} {1}%s{0} {3}R{0}{4}e{0}{2}a{0}{3}d{0}{4}y{0}{1}...{0}{6}' % fversion(self.config_version)
             self.log_always(msg, color=True)
             if self.kalico:
                 self.log_error("Warning: You are running on Kalico (Danger-Klipper). Support is not guaranteed!")
