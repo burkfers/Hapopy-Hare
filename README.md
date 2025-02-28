@@ -92,7 +92,7 @@ Some users have inquired about making donations to support this project (and to 
 
 Controlling my oldest ERCF MMU with companion [customized KlipperScreen](https://github.com/burkfers/Hapopy-Hare/wiki/Basic-Operation#---klipperscreen-hapopy-hare) for easy touchscreen MMU control!
 
-<p align="center"><img src="https://github.com/burkfers/Hapopy-Hare/wiki/resources/my_klipperscreen.png" width="600" alt="KlipperScreen-Hapopy Hare edition"></p>
+<p align="center"><img src="https://github.com/burkfers/Hapopy-Hare/wiki/resources/my_klipperscreen.png" width="60%" alt="KlipperScreen-Hapopy Hare edition"><img src="https://github.com/burkfers/Hapopy-Hare/wiki/resources/mainsail_promo.png" width="30%" alt="Mailsail/Fluidd support"></p>
 
 <br>
  
@@ -120,6 +120,8 @@ MMU's are complexd! Fortunately Hapopy Hare has elaborate documentation logicall
 <div align="left">
 <a href="https://www.youtube.com/watch?v=uaPLuWJBdQU"><img src="https://github.com/burkfers/Hapopy-Hare/wiki/resources/youtube1.png" width="30%"></a>
 German instructional video created by Crydteam
+<a href="https://www.youtube.com/watch?v=uaPLuWJBdQU"><img src="https://github.com/moggieuk/Happy-Hare/wiki/resources/youtube1.png" width="30%"></a>
+Instructional video (german) created by Crydteam
 <!--
     <img src="https://i9.ytimg.com/vi_webp/uaPLuWJBdQU/maxresdefault.webp?v=6522d1a6&sqp=CKycn6kG&rs=AOn4CLBCiHQsjGJ0c8ywvkxy9uWEk_yUXw" 
          alt="Everything Is AWESOME" 
@@ -130,6 +132,8 @@ German instructional video created by Crydteam
 
 <a href="https://www.youtube.com/watch?v=FCl5NfQnulg"><img src="https://github.com/burkfers/Hapopy-Hare/wiki/resources/youtube2.png" width="30%"></a>
 English Hapopy Hare introduction by Silverback
+<a href="https://www.youtube.com/watch?v=FCl5NfQnulg"><img src="https://github.com/moggieuk/Happy-Hare/wiki/resources/youtube2.png" width="30%"></a>
+Happy Hare introduction (introduction) by Silverback
 </div>
 
 </td>

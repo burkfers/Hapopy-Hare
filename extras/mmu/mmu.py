@@ -186,8 +186,9 @@ class Mmu:
     # Mainsail/Fluid visualization of extruder colors and other attributes
     T_MACRO_COLOR_ALLGATES = 'allgates' # Color from gate map (all tools). Will add spool_id if spoolman is enabled
     T_MACRO_COLOR_GATEMAP  = 'gatemap'  # As per gatemap but hide empty tools. Will add spool_id if spoolman is enabled
-    T_MACRO_COLOR_SLICER   = 'slicer'   # Color from slicer tool map
-    T_MACRO_COLOR_OPTIONS  = [T_MACRO_COLOR_GATEMAP, T_MACRO_COLOR_SLICER, T_MACRO_COLOR_ALLGATES]
+    T_MACRO_COLOR_SLICER   = 'slicer'   # Color from slicer tool map. Will add spool_id if spoolman is enabled
+    T_MACRO_COLOR_OFF      = 'off'      # Turn off color and spool_id association
+    T_MACRO_COLOR_OPTIONS  = [T_MACRO_COLOR_GATEMAP, T_MACRO_COLOR_SLICER, T_MACRO_COLOR_ALLGATES, T_MACRO_COLOR_OFF]
 
     # Spoolman integration - modes of operation
     SPOOLMAN_OFF           = 'off'      # Spoolman disabled
@@ -553,9 +554,9 @@ class Mmu:
         self.gcode.register_command('MMU_PRELOAD', self.cmd_MMU_PRELOAD, desc = self.cmd_MMU_PRELOAD_help)
         self.gcode.register_command('MMU_SELECT_BYPASS', self.cmd_MMU_SELECT_BYPASS, desc = self.cmd_MMU_SELECT_BYPASS_help)
         self.gcode.register_command('MMU_CHANGE_TOOL', self.cmd_MMU_CHANGE_TOOL, desc = self.cmd_MMU_CHANGE_TOOL_help)
-        # TODO Currently cannot not registered directly as Tx commands because not visible by Mainsail/Fluuid
-        # for tool in range(self.num_gates):
-        #     self.gcode.register_command('T%d' % tool, self.cmd_MMU_CHANGE_TOOL, desc = "Change to tool T%d" % tool)
+        # TODO Currently cannot not registered directly as Tx commands because cannot attach color/spool_id required by Mailsail
+        #for tool in range(self.num_gates):
+        #    self.gcode.register_command('T%d' % tool, self.cmd_MMU_CHANGE_TOOL, desc = "Change to tool T%d" % tool)
         self.gcode.register_command('MMU_LOAD', self.cmd_MMU_LOAD, desc=self.cmd_MMU_LOAD_help)
         self.gcode.register_command('MMU_EJECT', self.cmd_MMU_EJECT, desc = self.cmd_MMU_EJECT_help)
         self.gcode.register_command('MMU_UNLOAD', self.cmd_MMU_UNLOAD, desc = self.cmd_MMU_UNLOAD_help)
@@ -1084,6 +1085,7 @@ class Mmu:
         self.gate_color_rgb = [self._color_to_rgb_tuple(i) for i in self.gate_color]
 
     # Helper to keep parallel RGB color map updated when slicer color or TTG changes
+    # Will also update the t_macro colors
     def _update_slicer_color_rgb(self):
         self.slicer_color_rgb = [(0.,0.,0.)] * self.num_gates
         for tool_key, tool_value in self.slicer_tool_map['tools'].items():
@@ -7375,8 +7377,13 @@ class Mmu:
 
             if t_macro:
                 t_vars = dict(t_macro.variables) # So Mainsail sees the update
+
                 spool_id = self.gate_spool_id[gate]
-                if spool_id >= 0 and not self.spoolman_support == self.SPOOLMAN_OFF and self.gate_status[gate] != self.GATE_EMPTY and self.t_macro_color == self.T_MACRO_COLOR_GATEMAP:
+                if (self.t_macro_color != self.T_MACRO_COLOR_OFF and
+                    spool_id >= 0 and
+                    self.spoolman_support != self.SPOOLMAN_OFF and
+                    self.gate_status[gate] != self.GATE_EMPTY):
+
                     t_vars['spool_id'] = self.gate_spool_id[gate]
                 else:
                     t_vars.pop('spool_id', None)
@@ -7388,14 +7395,17 @@ class Mmu:
                         t_vars['color'] = rgb_hex
                     else:
                         t_vars.pop('color', None)
+
                 elif self.t_macro_color in [self.T_MACRO_COLOR_GATEMAP, self.T_MACRO_COLOR_ALLGATES]:
                     rgb_hex = self._color_to_rgb_hex(self.gate_color[gate])
                     if self.gate_status[gate] != self.GATE_EMPTY or self.t_macro_color == self.T_MACRO_COLOR_ALLGATES:
                         t_vars['color'] = rgb_hex
                     else:
                         t_vars.pop('color', None)
-                else:
+
+                else: # 'off' case
                     t_vars.pop('color', None)
+
                 t_macro.variables = t_vars
 
 ### GCODE COMMANDS FOR RUNOUT, TTG MAP, GATE MAP and GATE LOGIC ##################
@@ -7734,9 +7744,9 @@ class Mmu:
 
                 if self.spoolman_support != self.SPOOLMAN_PULL:
                     # Local gate map, can update attributes
-                    name = name or self.gate_filament_name[gate]
-                    material = (material or self.gate_material[gate]).upper()
-                    color = (color or self.gate_color[gate]).lower()
+                    name = name if name is not None else self.gate_filament_name[gate]
+                    material = (material if material is not None else self.gate_material[gate]).upper()
+                    color = (color if color is not None else self.gate_color[gate]).lower()
                     temperature = temperature or self.gate_temperature
                     spool_id = spool_id or self.gate_spool_id[gate]
 
