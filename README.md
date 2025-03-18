@@ -92,7 +92,7 @@ Some users have inquired about making donations to support this project (and to 
 
 Controlling my oldest ERCF MMU with companion [customized KlipperScreen](https://github.com/burkfers/Hapopy-Hare/wiki/Basic-Operation#---klipperscreen-hapopy-hare) for easy touchscreen MMU control and new Mainsail/Fluidd integration!
 
-<p align="center"><img src="https://github.com/burkfers/Hapopy-Hare/wiki/resources/my_klipperscreen.png" width="60%" alt="KlipperScreen-Happy Hare edition"><img src="https://github.com/moggieuk/Happy-Hare/wiki/resources/mainsail_mmu_panel.png" width="35%" alt="Mailsail/Fluidd support"></p>
+<p align="center"><img src="https://github.com/burkfers/Hapopy-Hare/wiki/resources/my_klipperscreen.png" width="60%" alt="KlipperScreen-Hapopy Hare edition"><img src="https://github.com/burkfers/Hapopy-Hare/wiki/resources/mainsail_mmu_panel.png" width="35%" alt="Mailsail/Fluidd support"></p>
 
 <br>
  
@@ -125,7 +125,7 @@ Great (english) overview including Mainsail UI support
 Instructional video (german) created by Crydteam
 
 <br><a href="https://www.youtube.com/watch?v=FCl5NfQnulg"><img src="https://github.com/burkfers/Hapopy-Hare/wiki/resources/youtube2.png" width="30%"></a>
-Happy Hare introduction (introduction) by Silverback
+Hapopy Hare introduction (introduction) by Silverback
 </div>
 
 </td>

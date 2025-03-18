@@ -265,6 +265,7 @@ class Mmu:
         self.has_mmu_cutter = False           # Post unload cutting macro (like EREC)
         self.has_toolhead_cutter = False      # Form tip cutting macro (like _MMU_CUT_TIP)
         self._is_running_test = False         # True while running QA or soak tests
+        self.slicer_tool_map = None
 
         # Event handlers
         self.printer.register_event_handler('klippy:connect', self.handle_connect)
@@ -374,7 +375,7 @@ class Mmu:
         self.toolhead_extruder_to_nozzle = config.getfloat('toolhead_extruder_to_nozzle', 0., minval=5.) # For "sensorless"
         self.toolhead_sensor_to_nozzle = config.getfloat('toolhead_sensor_to_nozzle', 0., minval=1.) # For toolhead sensor
         self.toolhead_entry_to_extruder = config.getfloat('toolhead_entry_to_extruder', 0., minval=0.) # For extruder (entry) sensor
-        self.toolhead_residual_filament = config.getfloat('toolhead_residual_filament', 0., minval=0., maxval=50.) # +ve value = reduction of load length
+        self.toolhead_residual_filament = config.getfloat('toolhead_residual_filament', 0., minval=0., maxval=60.) # +ve value = reduction of load length
         self.toolhead_ooze_reduction = config.getfloat('toolhead_ooze_reduction', 0., minval=-5., maxval=20.) # +ve value = reduction of load length
         self.toolhead_unload_safety_margin = config.getfloat('toolhead_unload_safety_margin', 10., minval=0.) # Extra unload distance
         self.toolhead_move_error_tolerance = config.getfloat('toolhead_move_error_tolerance', 60, minval=0, maxval=100) # Allowable delta movement % before error
@@ -551,8 +552,8 @@ class Mmu:
         self.gcode.register_command('MMU_LED', self.cmd_MMU_LED, desc = self.cmd_MMU_LED_help)
         self.gcode.register_command('MMU_HOME', self.cmd_MMU_HOME, desc = self.cmd_MMU_HOME_help)
         self.gcode.register_command('MMU_SELECT', self.cmd_MMU_SELECT, desc = self.cmd_MMU_SELECT_help)
+        self.gcode.register_command('MMU_SELECT_BYPASS', self.cmd_MMU_SELECT_BYPASS, desc = self.cmd_MMU_SELECT_BYPASS_help) # Alias for MMU_SELECT BYPASS=1
         self.gcode.register_command('MMU_PRELOAD', self.cmd_MMU_PRELOAD, desc = self.cmd_MMU_PRELOAD_help)
-        self.gcode.register_command('MMU_SELECT_BYPASS', self.cmd_MMU_SELECT_BYPASS, desc = self.cmd_MMU_SELECT_BYPASS_help)
         self.gcode.register_command('MMU_CHANGE_TOOL', self.cmd_MMU_CHANGE_TOOL, desc = self.cmd_MMU_CHANGE_TOOL_help)
         # TODO Currently cannot not registered directly as Tx commands because cannot attach color/spool_id required by Mailsail
         #for tool in range(self.num_gates):
@@ -603,6 +604,7 @@ class Mmu:
         self.gcode.register_command('_MMU_STEP_HOMING_MOVE', self.cmd_MMU_STEP_HOMING_MOVE, desc = self.cmd_MMU_STEP_HOMING_MOVE_help)
         self.gcode.register_command('_MMU_STEP_MOVE', self.cmd_MMU_STEP_MOVE, desc = self.cmd_MMU_STEP_MOVE_help)
         self.gcode.register_command('_MMU_STEP_SET_FILAMENT', self.cmd_MMU_STEP_SET_FILAMENT, desc = self.cmd_MMU_STEP_SET_FILAMENT_help)
+        self.gcode.register_command('_MMU_STEP_SET_ACTION', self.cmd_MMU_STEP_SET_ACTION, desc = self.cmd_MMU_STEP_SET_ACTION_help)
         self.gcode.register_command('_MMU_M400', self.cmd_MMU_M400, desc = self.cmd_MMU_M400_help) # Wait on both movequeues
 
         # Internal handlers for Runout & Insertion for all sensor options
@@ -976,6 +978,7 @@ class Mmu:
         self.filament_pos = self.FILAMENT_POS_UNKNOWN
         self.filament_direction = self.DIRECTION_UNKNOWN
         self.action = self.ACTION_IDLE
+        self._old_action = None
         self._clear_saved_toolhead_position()
         self._reset_job_statistics()
         self.print_state = self.resume_to_state = "ready"
@@ -989,9 +992,14 @@ class Mmu:
         self.selector.reinit()
 
     def _clear_slicer_tool_map(self):
+        skip = self.slicer_tool_map.get('skip_automap', False) if self.slicer_tool_map else False
         self.slicer_tool_map = {'tools': {}, 'referenced_tools': [], 'initial_tool': None, 'purge_volumes': [], 'total_toolchanges': None}
+        self._restore_automap_option(skip)
         self.slicer_color_rgb = [(0.,0.,0.)] * self.num_gates
         self._update_t_macros() # Clear 'color' on Tx macros if displaying slicer colors
+
+    def _restore_automap_option(self, skip=False):
+        self.slicer_tool_map['skip_automap'] = skip
 
     # Helper to infer type for setting gcode macro variables
     def _fix_type(self, s):
@@ -3055,6 +3063,7 @@ class Mmu:
             self.resume_to_state = "ready"
             self.paused_extruder_temp = None
             self.reactor.update_timer(self.hotend_off_timer, self.reactor.NEVER) # Don't automatically turn off extruder heaters
+            self._restore_automap_option()
             self._disable_runout() # Disable runout/clog detection after print
 
             if self.printer.lookup_object("idle_timeout").idle_timeout != self.default_idle_timeout:
@@ -3990,6 +3999,20 @@ class Mmu:
         state = gcmd.get_int('STATE', minval=self.FILAMENT_POS_UNKNOWN, maxval=self.FILAMENT_POS_LOADED)
         silent = gcmd.get_int('SILENT', 0)
         self._set_filament_pos_state(state, silent)
+
+    cmd_MMU_STEP_SET_ACTION_help = "User composable loading step: Set action state"
+    def cmd_MMU_STEP_SET_ACTION(self, gcmd):
+        self.log_to_file(gcmd.get_commandline())
+        if gcmd.get_int('RESTORE', 0):
+            if self._old_action is not None:
+                self._set_action(self._old_action)
+            self._old_action = None
+        else:
+            state = gcmd.get_int('STATE', minval=self.ACTION_IDLE, maxval=self.ACTION_PURGING)
+            if self._old_action is None:
+                self._old_action = self._set_action(state)
+            else:
+                self._set_action(state)
 
 
 ##############################################
@@ -7888,6 +7911,7 @@ class Mmu:
         purge_volumes = gcmd.get('PURGE_VOLUMES', "")
         num_slicer_tools = gcmd.get_int('NUM_SLICER_TOOLS', self.num_gates, minval=1, maxval=self.num_gates) # Allow slicer to have less tools than MMU gates
         automap_strategy = gcmd.get('AUTOMAP', None)
+        skip_automap = bool(gcmd.get_int('SKIP_AUTOMAP', None, minval=0, maxval=1))
 
         quiet = False
         if reset:
@@ -7896,11 +7920,15 @@ class Mmu:
         else:
             self.slicer_tool_map = dict(self.slicer_tool_map) # Ensure that webhook sees get_status() change
 
+        if skip_automap is not None:
+            # This is a "one-print" option that supresses automatic automap
+            self._restore_automap_option(skip_automap)
+
         if tool >= 0:
             self.slicer_tool_map['tools'][str(tool)] = {'color': color, 'material': material, 'temp': temp, 'name': name, 'in_use': used}
             if used:
                 self.slicer_tool_map['referenced_tools'] = sorted(set(self.slicer_tool_map['referenced_tools'] + [tool]))
-                if automap_strategy and automap_strategy != self.AUTOMAP_NONE:
+                if not self.slicer_tool_map['skip_automap'] and automap_strategy and automap_strategy != self.AUTOMAP_NONE:
                     self._automap_gate(tool, automap_strategy)
             if color:
                 self._update_slicer_color_rgb()

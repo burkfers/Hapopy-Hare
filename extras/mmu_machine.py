@@ -50,7 +50,7 @@ VENDOR_BOX_TURTLE     = "BoxTurtle"
 VENDOR_NIGHT_OWL      = "NightOwl"
 VENDOR_3MS            = "3MS"
 VENDOR_3D_CHAMELEON   = "3DChameleon"
-VENDOR_PICO_MMU       = "PicoMMU" # Not yet ready
+VENDOR_PICO_MMU       = "PicoMMU"
 VENDOR_QUATTRO_BOX    = "QuattroBox"
 VENDOR_OTHER          = "Other"
 
@@ -159,7 +159,7 @@ class MmuMachine:
             variable_rotation_distances = 0
             variable_bowden_lengths = 0
             require_bowden_move = 1
-            filament_always_gripped = 1
+            filament_always_gripped = 0
             has_bypass = 0
 
         elif self.mmu_vendor == VENDOR_QUATTRO_BOX:
@@ -171,6 +171,7 @@ class MmuMachine:
             has_bypass = 0
 
         # Still allow MMU design attributes to be altered or set for custom MMU
+        self.display_name = config.get('display_name', UNIT_ALT_DISPLAY_NAMES.get(self.mmu_vendor, self.mmu_vendor))
         self.selector_type = config.getchoice('selector_type', {o: o for o in ['LinearSelector', 'VirtualSelector', 'MacroSelector', 'RotarySelector', 'ServoSelector']}, selector_type)
         self.variable_rotation_distances = bool(config.getint('variable_rotation_distances', variable_rotation_distances))
         self.variable_bowden_lengths = bool(config.getint('variable_bowden_lengths', variable_bowden_lengths))
@@ -236,7 +237,8 @@ class MmuMachine:
         self.unit_status = {}
         for i, unit in enumerate(self.units):
             unit_info = {}
-            unit_info['name'] = UNIT_ALT_DISPLAY_NAMES.get(self.mmu_vendor, self.mmu_vendor)
+            unit_info['name'] = self.display_name
+            unit_info['vendor'] = self.mmu_vendor
             unit_info['version'] = self.mmu_version_string
             unit_info['num_gates'] = unit
             unit_info['first_gate'] = gate_count
