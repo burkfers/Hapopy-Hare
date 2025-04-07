@@ -268,7 +268,7 @@ class MmuServer:
         filament = spool_info["filament"]
         name = filament.get('name', '')
         material = filament.get('material', '')
-        color_hex = filament.get('color_hex', '').strip('#')[:6].lower() # First remove # character if present then strip alpha channel if it exists
+        color_hex = filament.get('color_hex', '').strip('#')[:8].lower() # Remove problematic First # character if present
         temp = filament.get('settings_extruder_temp', '')
         return {'spool_id': spool_id, 'material': material, 'color': color_hex, 'name': name, 'temp': temp}
 
@@ -415,7 +415,7 @@ class MmuServer:
                 for gate, spool_id in gate_ids
             }
             try:
-                await self.klippy_apis.run_gcode(f"MMU_GATE_MAP MAP=\"{gate_dict}\" {'REPLACE=1' if replace else ''} QUIET=1")
+                await self.klippy_apis.run_gcode(f"MMU_GATE_MAP MAP=\"{gate_dict}\" {'REPLACE=1' if replace else ''} FROM_SPOOLMAN=1 QUIET=1")
             except Exception as e:
                 await self._log_n_send(f"Exception running MMU_GATE_MAP gcode: {str(e)}", error=True, silent=silent)
                 return False
