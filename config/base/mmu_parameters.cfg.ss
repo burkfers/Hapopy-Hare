@@ -55,7 +55,7 @@ gear_max_accel: 1500			# Never to be exceeded gear acceleration regardless of sp
 servo_duration: 0.5			# Duration of PWM burst sent to servo (default non-active mode, automatically turns off)
 servo_dwell: 0.8			# Minimum time given to servo to complete movement prior to next move
 servo_always_active: 0			# CAUTION: 1=Force servo to always stay active, 0=Release after movement
-#selector_gate_angles: 45, 90, 135, 180	# Optionally set default list of gate angles (overriden by calibration)
+selector_gate_angles: 45, 90, 135, 180	# Optionally set default list of gate angles (overriden by calibration)
 selector_bypass_angle: -1		# Optionally set default servo angle when bypass is selected, -1=No default
 selector_release_angle: -1		# Optionally force a specific "release" angle, -1=Default (between gate angles) behavior
 
@@ -79,6 +79,7 @@ log_file_level: 2			# Can also be set to -1 to disable log file completely
 log_statistics: 1 			# 1 to log statistics on every toolchange (default), 0 to disable (but still recorded)
 log_visual: 1				# 1 log visual representation of filament, 0 = disable
 log_startup_status: 1			# Whether to log tool to gate status on startup, 1 = summary (default), 0 = disable
+log_m117_messages: 1			# Whether send toolchange message via M117 to screen
 
 
 # Movement speeds ------------------------------------------------------------------------------------------------------
@@ -344,7 +345,7 @@ slicer_tip_park_pos: 0                  # This specifies the position of filamen
 # Often it is useful to increase the extruder current for the often rapid puring movement to ensure high torque and no skipped steps
 #
 force_purge_standalone: 0               # 0 = Slicer wipetower in print else standalone, 1 = Always standalone purging (TURN WIPETOWER OFF!)
-purge_macro:				# Name of macro to call to perform the standalone purging operation. E.g. BLOBIFIER
+purge_macro: _MMU_PURGE			# Name of macro to call to perform the standalone purging operation. E.g. BLOBIFIER, _MMU_PURGE
 extruder_purge_current: 100             # % of extruder current (100%-150%) to use when purging (100 to disable)
 
 
@@ -397,7 +398,8 @@ sync_multiplier_low: 0.95               # Minimum factor to apply
 #
 #    rewind - when filament is being unloaded under MMU control (aka respool)
 #    assist - when filament is being loaded under MMU control (% of "rewind" speed but with minimum of "print" power)
-#    print  - while printing. Generally set 'espooler_printing_power' to a low percentage just to allow motor to be turned freely
+#    print  - while printing. Generally set 'espooler_printing_power' to a low percentage just to allow motor to be turned
+#             freely or set to 0 to enable/allow "burst" assist movements
 #
 # If using a digitally controlled espooler motor (not PWM) then you should turn off the "print" mode and set
 # 'espooler_min_stepper_speed' to prevent "over movement"
@@ -407,8 +409,14 @@ espooler_max_stepper_speed: 300			# Gear stepper speed at which espooler will be
 espooler_min_stepper_speed: 0			# Gear stepper speed at which espooler will become inactive (useful for non PWM control)
 espooler_speed_exponent: 0.5			# Controls non-linear espooler power relative to stepper speed (see notes)
 espooler_assist_reduced_speed: 50		# Control the % of the rewind speed that is applied to assisting load (want rewind to be faster)
-espooler_printing_power: 10			# If >0, fixes the % of PWM power while printing.
+espooler_printing_power: 0			# If >0, fixes the % of PWM power while printing. 0=allows burst movement
 espooler_operations: rewind, assist, print	# List of operational modes (allows disabling even if h/w is configured)
+#
+# The following burst configuration is used only if 'print' operation is enabled and 'espooler_printing_power: 0'
+#
+espooler_assist_extruder_move_length: 100	# Distance (mm) extruder needs to move between each assist burst
+espooler_assist_burst_power: 100		# The % power of the burst move
+espooler_assist_burst_duration: 0.4		# The duration of the burst move is seconds
 
 
 # Filament Management Options ----------------------------------------------------------------------------------------
@@ -589,7 +597,7 @@ update_bit_max_time: 1		# 1 = Increase BIT_MAX_TIME, 0 = Leave the klipper defau
 #
 # 'pause_macro' defines what macro to call on MMU error (must put printer in paused state)
 # Other macros are detailed in 'mmu_sequence.cfg'
-# Also see form_tip_macro in Tip Forming section
+# Also see form_tip_macro in Tip Forming section and purge_macro in Purging section
 #
 pause_macro: PAUSE 					# What macro to call to pause the print
 action_changed_macro: _MMU_ACTION_CHANGED		# Called when action (printer.mmu.action) changes

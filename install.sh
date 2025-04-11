@@ -1409,7 +1409,7 @@ questionaire() {
     option PICO_MMU       'PicoMMU'
     option QUATTRO_BOX    'QuattroBox v1.0'
     option QUATTRO_BOX11  'QuattroBox v1.1'
-    #option MMX            'MMX'
+    option MMX            'MMX'
     #option VVD            'BigTreeTech VVD'
     #option KMS            'Biqu KMS'
     option OTHER          'Other / Custom (or just want starter config files)'
@@ -1787,31 +1787,31 @@ questionaire() {
             ;;
 
         "$MMX")
-            # Comming soon...
             HAS_ENCODER=no
             HAS_SELECTOR=no
             HAS_SERVO=yes
             SETUP_SELECTOR_TOUCH=no
-            _hw_mmu_vendor="PicoMMU"
+            _hw_mmu_vendor="MMX"
             _hw_mmu_version="1.0"
             _hw_selector_type=ServoSelector
             _hw_variable_bowden_lengths=0
             _hw_variable_rotation_distances=0
             _hw_require_bowden_move=1
             _hw_filament_always_gripped=1
-            _hw_gear_gear_ratio="1.28:1"
+            _hw_gear_gear_ratio="80:20"
             _hw_gear_run_current=0.7
             _hw_gear_hold_current=0.1
             _hw_chain_count=4
-            _hw_exit_leds="neopixel:mmu_leds (1-4)"
+            _hw_exit_leds="neopixel:mmu_leds (4-1)"
             _hw_entry_leds=""
             _hw_status_leds=""
             _hw_logo_leds=""
             _param_extruder_homing_endstop="none"
             _param_gate_homing_endstop="mmu_gate"
-            _param_gate_homing_max=100
+            _param_gate_homing_max=1000
             _param_gate_parking_distance=25
             _param_gear_homing_speed=80
+            _param_selector_gate_angles="60,0,180,120"
             ;;
 
         "$VVD")
@@ -2172,11 +2172,11 @@ questionaire() {
         elif [ "${_hw_mmu_vendor}" == "PicoMMU" ]; then
             echo -e "${PROMPT}${SECTION}Which servo are you using?${INPUT}"
             OPTIONS=()
-            option PICOMMU_BOM 'MG996R'
+            option MMX_BOM 'MG996R'
             option OTHER 'Not listed / Other'
             prompt_option opt 'Servo' "${OPTIONS[@]}"
             case $opt in
-                "$PICOMMU_BOM")
+                "$MMX_BOM")
                     _hw_maximum_servo_angle=180
                     _hw_minimum_pulse_width=0.00070
                     _hw_maximum_pulse_width=0.00230
@@ -2437,8 +2437,8 @@ cleanup_old_klippy_modules
 if [ "$UNINSTALL" -eq 0 ]; then
     if [ "${INSTALL}" -eq 1 ]; then
         echo -e "${TITLE}$(get_logo "Hapopy Hare interactive installer...")"
-        read_default_config  # Parses template file parameters into memory
         questionaire         # Update in memory parameters from questionaire
+        read_default_config  # Parses template file parameters into memory
 
         if [ "${INSTALL_PRINTER_INCLUDES}" == "yes" ]; then
             install_printer_includes

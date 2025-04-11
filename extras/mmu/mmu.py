@@ -443,8 +443,12 @@ class Mmu:
         self.espooler_min_stepper_speed = config.getfloat('espooler_min_stepper_speed', 0., minval=0., below=self.espooler_max_stepper_speed)
         self.espooler_speed_exponent = config.getfloat('espooler_speed_exponent', 0.5, above=0)
         self.espooler_assist_reduced_speed = config.getint('espooler_assist_reduced_speed', 50, minval=0, maxval=100)
-        self.espooler_printing_power = config.getint('espooler_printing_power', 10, minval=0, maxval=100)
+        self.espooler_printing_power = config.getint('espooler_printing_power', 0, minval=0, maxval=100)
+        self.espooler_assist_extruder_move_length = config.getfloat("espooler_assist_extruder_move_length", 100, above=10.)
+        self.espooler_assist_burst_power = config.getint("espooler_assist_burst_power", 50, minval=0, maxval=100)
+        self.espooler_assist_burst_duration = config.getfloat("espooler_assist_burst_duration", 4, above=0., maxval=10.)
         self.espooler_operations = list(config.getlist('espooler_operations', self.ESPOOLER_OPERATIONS))
+
 
         # Optional features
         self.has_filament_buffer = bool(config.getint('has_filament_buffer', 1, minval=0, maxval=1))
@@ -468,6 +472,7 @@ class Mmu:
         self.log_statistics = config.getint('log_statistics', 0, minval=0, maxval=1)
         self.log_visual = config.getint('log_visual', 1, minval=0, maxval=1)
         self.log_startup_status = config.getint('log_startup_status', 1, minval=0, maxval=2)
+        self.log_m117_messages = config.getint('log_m117_messages', 1, minval=0, maxval=1)
 
         # Cosmetic console stuff
         self.console_stat_columns = list(config.getlist('console_stat_columns', ['unload', 'load', 'total']))
@@ -3677,15 +3682,31 @@ class Mmu:
             if self.paused_extruder_temp < klipper_minimum_temp:
                 # Don't wait if just messing with cold printer
                 wait = False
+
         elif source == "auto": # Normal case
             if self.is_mmu_paused():
                 # In a pause we always want to restore the temp we paused at
-                new_target_temp = self.paused_extruder_temp if self.paused_extruder_temp is not None else current_temp # Pause temp should not be None
-                source = "pause"
+                if self.paused_extruder_temp is not None:
+                    new_target_temp = self.paused_extruder_temp
+                    source = "pause"
+                else: # Pause temp should not be None
+                    new_target_temp = current_temp
+                    source = "current"
+
             elif self.is_printing():
-                # While actively printing, we want to defer to the slicer for temperature
-                new_target_temp = current_target_temp
-                source = "slicer"
+                if current_target_temp < klipper_minimum_temp:
+                    # Almost certainly means the initial tool change before slicer has set
+                    if self.gate_selected >= 0:
+                        new_target_temp = gate_temp
+                        source = "gatemap"
+                    else:
+                        new_target_temp = self.default_extruder_temp
+                        source = "mmu default"
+                else:
+                    # While actively printing, we want to defer to the slicer for temperature
+                    new_target_temp = current_target_temp
+                    source = "slicer"
+
             else:
                 # Standalone "just messing" case
                 if current_target_temp > klipper_minimum_temp:
@@ -3699,12 +3720,13 @@ class Mmu:
                         new_target_temp = self.default_extruder_temp
                         source = "mmu default"
 
-            if new_target_temp < klipper_minimum_temp:
-                new_target_temp = klipper_minimum_temp
-                source = "klipper minimum"
+            # Final safety check
+            if new_target_temp <= klipper_minimum_temp:
+                new_target_temp = self.default_extruder_temp
+                source = "mmu default"
 
         if new_target_temp > current_target_temp:
-            if source in ["mmu default", "gatemap", "klipper minimum"]:
+            if source in ["mmu default", "gatemap"]:
                 # We use error log channel to avoid heating surprise. This will also cause popup in Klipperscreen
                 self.log_error("Warning: Automatically heating extruder to %s temp (%.1f%sC)" % (source, new_target_temp, UI_DEGREE))
             else:
@@ -3904,15 +3926,27 @@ class Mmu:
                     msg += "not fitted"
             self.log_always(msg)
             return
-
-        if operation not in self.ESPOOLER_OPERATIONS:
-            raise gcmd.error("Invalid operation. Options are: %s" % ", ".join(self.ESPOOLER_OPERATIONS))
+        operation = operation.lower()
 
         gate = gcmd.get_int('GATE', None, minval=0, maxval=self.num_gates)
         if gate is None:
             gate = self.gate_selected
         if gate < 0:
             raise gcmd.error("Invalid gate")
+
+        if operation == "burst":
+            power = gcmd.get_int('POWER', self.espooler_assist_burst_power, minval=0, maxval=100)
+            duration = gcmd.get_float('DURATION', 3. , above=0., maxval=10.)
+            cur_op, cur_value = self.espooler.get_operation(gate)
+            if cur_op == self.ESPOOLER_PRINT:
+                self.log_info("Sending 'mmu:espooler_advance' event(gate=%d, power=%d, duration=%.2fs)" % (gate, power, duration))
+                self.printer.send_event("mmu:espooler_advance", gate, power / 100., duration)
+            else:
+                raise gcmd.error("Espooler on gate %d is not in 'print' mode" % gate)
+            return
+
+        if operation not in self.ESPOOLER_OPERATIONS:
+            raise gcmd.error("Invalid operation. Options are: %s" % ", ".join(self.ESPOOLER_OPERATIONS))
 
         default_power = self.espooler_printing_power if operation == self.ESPOOLER_PRINT else 50
         power = gcmd.get_int('POWER', default_power, minval=0, maxval=100) if operation != self.ESPOOLER_OFF else 0
@@ -5966,7 +6000,8 @@ class Mmu:
     # Important to always inform use of "toolchange" operation is case there is an error and manual recovery is necessary
     def _note_toolchange(self, m117_msg):
         self._last_toolchange = m117_msg
-        self.gcode.run_script_from_command("M117 %s" % m117_msg)
+        if self.log_m117_messages:
+            self.gcode.run_script_from_command("M117 %s" % m117_msg)
 
     # Tell the sequence macros about where to move to next
     def _set_next_position(self, next_pos):
@@ -6496,7 +6531,8 @@ class Mmu:
                                     self.recover_filament_pos()
 
                             self._track_swap_completed()
-                            self.gcode.run_script_from_command("M117 T%s" % tool)
+                            if self.log_m117_messages:
+                                self.gcode.run_script_from_command("M117 T%s" % tool)
                         finally:
                             self._track_time_end('total')
                             self._next_tool = self.TOOL_GATE_UNKNOWN
@@ -7076,6 +7112,7 @@ class Mmu:
         self.log_file_level = gcmd.get_int('LOG_FILE_LEVEL', self.log_file_level, minval=0, maxval=4)
         self.log_visual = gcmd.get_int('LOG_VISUAL', self.log_visual, minval=0, maxval=1)
         self.log_statistics = gcmd.get_int('LOG_STATISTICS', self.log_statistics, minval=0, maxval=1)
+        self.log_m117_messages = gcmd.get_int('LOG_M117_MESSAGES', self.log_m117_messages, minval=0, maxval=1)
 
         console_gate_stat = gcmd.get('CONSOLE_GATE_STAT', self.console_gate_stat)
         if console_gate_stat not in self.GATE_STATS_TYPES:
@@ -7222,6 +7259,7 @@ class Mmu:
             if self.mmu_logger:
                 msg += "\nlog_file_level = %d" % self.log_file_level
             msg += "\nlog_statistics = %d" % self.log_statistics
+            msg += "\nlog_m117_messages = %d" % self.log_m117_messages
             msg += "\nconsole_gate_stat = %s" % self.console_gate_stat
 
             msg += "\n\nOTHER:"
