@@ -800,28 +800,32 @@ EOF
 # An empty pin can be deleted, commented or simply left blank. If you mcu has a separate "enable" pin
 #
 #[mmu_espooler mmu_espooler]
-#pwm: 1                                          # 1=PWM control (typical), 0=digital on/off control
-##hardware_pwm: 0                                # See klipper doc
-##cycle_time: 0.100                              # See klipper doc
-#scale: 1                                        # Scales the PWM output range
-#value: 0                                        # See klipper doc
-#shutdown_value: 0                               # See klipper doc
+#pwm: 1						# 1=PWM control (typical), 0=digital on/off control
+##hardware_pwm: 0				# See klipper doc
+##cycle_time: 0.100				# See klipper doc
+#scale: 1					# Scales the PWM output range
+#value: 0					# See klipper doc
+#shutdown_value: 0				# See klipper doc
 #
-#respool_motor_pin_0: mmu:MMU_ESPOOLER_RWD_0     # PWM (or digital) pin for rewind/respool movement
-#assist_motor_pin_0: mmu:MMU_ESPOOLER_FWD_0      # PWM (or digital) pin for forward motor movement
-#enable_motor_pin_0: mmu:MMU_ESPOOLER_EN_0       # Digital output for Afc mcu
+#respool_motor_pin_0: mmu:MMU_ESPOOLER_RWD_0	# PWM (or digital) pin for rewind/respool movement
+#assist_motor_pin_0: mmu:MMU_ESPOOLER_FWD_0	# PWM (or digital) pin for forward motor movement
+#enable_motor_pin_0: mmu:MMU_ESPOOLER_EN_0	# Digital output for Afc mcu
+#assist_trigger_pin_0: mmu:MMU_ESPOOLER_TRIG_0	# Trigger pin for sensing need to assist during print
 #
 #respool_motor_pin_1: mmu:MMU_ESPOOLER_RWD_1
 #assist_motor_pin_1: mmu:MMU_ESPOOLER_FWD_1
 #enable_motor_pin_1: mmu:MMU_ESPOOLER_EN_1
+#assist_trigger_pin_1: mmu:MMU_ESPOOLER_TRIG_1
 #
 #respool_motor_pin_2: mmu:MMU_ESPOOLER_RWD_2
 #assist_motor_pin_2: mmu:MMU_ESPOOLER_FWD_2
 #enable_motor_pin_2: mmu:MMU_ESPOOLER_EN_2
+#assist_trigger_pin_2: mmu:MMU_ESPOOLER_TRIG_2
 #
 #respool_motor_pin_3: mmu:MMU_ESPOOLER_RWD_3
 #assist_motor_pin_3: mmu:MMU_ESPOOLER_FWD_3
 #enable_motor_pin_3: mmu:MMU_ESPOOLER_EN_3
+#assist_trigger_pin_3: mmu:MMU_ESPOOLER_TRIG_3
 
 EOF
 )
@@ -1116,6 +1120,16 @@ copy_config_files() {
         fi
     done
 }
+
+remove_old_config_files() {
+    mmu_dir="${KLIPPER_CONFIG_HOME}/mmu"
+    if [ -f "${mmu_dir}/addons/dc_espooler.cfg" ]; then
+        echo -e "${WARNING}Removing legacy dc_spooler macros - configuration now in mmu_hardware.cfg"
+        rm -f "${mmu_dir}/addons/dc_espooler.cfg"
+        rm -f "${mmu_dir}/addons/dc_espooler_hw.cfg"
+    fi
+}
+
 
 uninstall_config_files() {
     if [ -d "${KLIPPER_CONFIG_HOME}/mmu" ]; then
@@ -2482,6 +2496,7 @@ if [ "$UNINSTALL" -eq 0 ]; then
     # Copy config files updating from in memory parmameters or h/w settings
     set +e
     copy_config_files
+    remove_old_config_files
     set -e
 
     # Special upgrades of mmu_hardware.cfg

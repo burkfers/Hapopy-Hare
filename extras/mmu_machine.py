@@ -290,7 +290,10 @@ class MmuToolHead(toolhead.ToolHead, object):
             time_high = self.buffer_time_high
 
         if hasattr(toolhead, 'LookAheadQueue'):
-            self.lookahead = toolhead.LookAheadQueue(self)
+            try:
+                self.lookahead = toolhead.LookAheadQueue(self) # Klipper < 3.13.0-46
+            except:
+                self.lookahead = toolhead.LookAheadQueue() # >= Klipper 3.13.0-46
             self.lookahead.set_flush_time(time_high)
         else:
             # Klipper backward compatibility
@@ -334,7 +337,7 @@ class MmuToolHead(toolhead.ToolHead, object):
         self.print_time = 0.
         self.special_queuing_state = "NeedPrime"
         self.priming_timer = None
-        self.drip_completion = None
+        self.drip_completion = None # TODO No longer part of Klipper >v0.13.0-46
         # Flush tracking
         self.flush_timer = self.reactor.register_timer(self._flush_handler)
         self.do_kick_flush_timer = True
