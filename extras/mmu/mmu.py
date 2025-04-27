@@ -7706,7 +7706,7 @@ class Mmu:
                     if strategy == self.AUTOMAP_FILAMENT_NAME:
                         equal = self._compare_unicode(tool_to_remap[tool_field], gate_feature)
                     else:
-                        equal = tool_to_remap[tool_field] == gate_feature
+                        equal = tool_to_remap[tool_field].ljust(8,'F') == gate_feature.ljust(8,'F')
                     if equal:
                         remaps.append("T%s --> G%s (%s)" % (tool, gn, gate_feature))
                         self.wrap_gcode_command("MMU_TTG_MAP TOOL=%d GATE=%d QUIET=1" % (tool, gn))
